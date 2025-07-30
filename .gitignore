@@ -39,3 +39,10 @@
 
 # debug information files
 *.dwo
+
+
+bin/
+bin-int/
+.vs/
+
+*sln
