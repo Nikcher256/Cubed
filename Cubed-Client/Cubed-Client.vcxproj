@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>IMGUI_DEFINE_MATH_OPERATORS;WL_PLATFORM_WINDOWS;WL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Cubed-Common\Source;..\Walnut\vendor\imgui;..\vendor\glfw\include;..\Walnut\vendor\glm;..\Walnut\vendor\spdlog\include;..\Walnut\Walnut\Source;..\Walnut\Walnut\Platform\GUI;C:\VulkanSDK\1.4.313.2\Include;..\Walnut\Walnut-Modules\Walnut-Networking\Source;..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSockets\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Cubed-Common\Source;..\Walnut\vendor\imgui;..\vendor\glfw\include;..\Walnut\vendor\glm;..\Walnut\vendor\spdlog\include;..\Walnut\Walnut\Source;..\Walnut\Walnut\Platform\GUI;C:\VulkanSDK\1.3.296.0\Include;..\Walnut\Walnut-Modules\Walnut-Networking\Source;..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSockets\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -102,7 +102,7 @@ IF EXIST "..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSocket
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>IMGUI_DEFINE_MATH_OPERATORS;WL_PLATFORM_WINDOWS;WL_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Cubed-Common\Source;..\Walnut\vendor\imgui;..\vendor\glfw\include;..\Walnut\vendor\glm;..\Walnut\vendor\spdlog\include;..\Walnut\Walnut\Source;..\Walnut\Walnut\Platform\GUI;C:\VulkanSDK\1.4.313.2\Include;..\Walnut\Walnut-Modules\Walnut-Networking\Source;..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSockets\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Cubed-Common\Source;..\Walnut\vendor\imgui;..\vendor\glfw\include;..\Walnut\vendor\glm;..\Walnut\vendor\spdlog\include;..\Walnut\Walnut\Source;..\Walnut\Walnut\Platform\GUI;C:\VulkanSDK\1.3.296.0\Include;..\Walnut\Walnut-Modules\Walnut-Networking\Source;..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSockets\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -131,7 +131,7 @@ IF EXIST "..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSocket
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>IMGUI_DEFINE_MATH_OPERATORS;WL_PLATFORM_WINDOWS;WL_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Cubed-Common\Source;..\Walnut\vendor\imgui;..\vendor\glfw\include;..\Walnut\vendor\glm;..\Walnut\vendor\spdlog\include;..\Walnut\Walnut\Source;..\Walnut\Walnut\Platform\GUI;C:\VulkanSDK\1.4.313.2\Include;..\Walnut\Walnut-Modules\Walnut-Networking\Source;..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSockets\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Cubed-Common\Source;..\Walnut\vendor\imgui;..\vendor\glfw\include;..\Walnut\vendor\glm;..\Walnut\vendor\spdlog\include;..\Walnut\Walnut\Source;..\Walnut\Walnut\Platform\GUI;C:\VulkanSDK\1.3.296.0\Include;..\Walnut\Walnut-Modules\Walnut-Networking\Source;..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSockets\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -157,6 +157,9 @@ IF EXIST "..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSocket
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Source\ClientLayer.h" />
+    <ClInclude Include="Source\Renderer\Renderer.h" />
+    <ClInclude Include="Source\Renderer\Texture.h" />
+    <ClInclude Include="Source\Renderer\Vulkan.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\ClientLayer.cpp">
@@ -169,6 +172,9 @@ IF EXIST "..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSocket
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
+    <ClCompile Include="Source\Renderer\Renderer.cpp" />
+    <ClCompile Include="Source\Renderer\Texture.cpp" />
+    <ClCompile Include="Source\Renderer\Vulkan.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cubed-Common\Cubed-Common.vcxproj">
@@ -177,6 +183,13 @@ IF EXIST "..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSocket
     <ProjectReference Include="..\Walnut\Walnut\Walnut.vcxproj">
       <Project>{C038E8D9-ACDA-12B0-9595-260481D69900}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Shaders\basic.frag.glsl" />
+    <None Include="Assets\Shaders\basic.vert.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Textures\simple.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

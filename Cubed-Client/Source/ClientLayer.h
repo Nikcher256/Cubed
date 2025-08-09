@@ -9,6 +9,8 @@
 #include <map>
 #include <mutex>
 
+#include "Renderer/Renderer.h"
+
 namespace Cubed {
 	class ClientLayer : public Walnut::Layer
 	{
@@ -23,8 +25,13 @@ namespace Cubed {
 	private:
 		void OnDataReceived(const Walnut::Buffer buffer);
 	private:
-		glm::vec2 m_PlayerPosition{ 50, 50 };
+		Renderer m_Renderer;
+
+		glm::vec2 m_PlayerPosition{ 0, 0 };
+		glm::vec3 m_PlayerRotation{ 30.0f, 45.0f, 0 };
 		glm::vec2 m_PlayerVelocity{ 0, 0 };
+
+		Camera m_Camera;
 
 		std::string m_ServerAddress;
 
