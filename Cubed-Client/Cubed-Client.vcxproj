@@ -156,12 +156,14 @@ IF EXIST "..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSocket
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Assets\TextureManager.h" />
     <ClInclude Include="Source\ClientLayer.h" />
     <ClInclude Include="Source\Renderer\Renderer.h" />
-    <ClInclude Include="Source\Renderer\Texture.h" />
+    <ClInclude Include="Source\Assets\Texture.h" />
     <ClInclude Include="Source\Renderer\Vulkan.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Assets\TextureManager.cpp" />
     <ClCompile Include="Source\ClientLayer.cpp">
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
@@ -173,7 +175,7 @@ IF EXIST "..\Walnut\Walnut-Modules\Walnut-Networking\vendor\GameNetworkingSocket
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <ClCompile Include="Source\Renderer\Renderer.cpp" />
-    <ClCompile Include="Source\Renderer\Texture.cpp" />
+    <ClCompile Include="Source\Assets\Texture.cpp" />
     <ClCompile Include="Source\Renderer\Vulkan.cpp" />
   </ItemGroup>
   <ItemGroup>

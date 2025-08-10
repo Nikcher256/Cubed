@@ -22,14 +22,15 @@ namespace Cubed {
 		virtual void OnUpdate(float ts) override;
 		virtual void OnRender() override;
 		virtual void OnUIRender() override;
+		virtual void OnSwapchainRecreated() override;
 	private:
 		void OnDataReceived(const Walnut::Buffer buffer);
 	private:
 		Renderer m_Renderer;
 
-		glm::vec2 m_PlayerPosition{ 0, 0 };
+		glm::vec3 m_PlayerPosition{ 0, 0, 0};
 		glm::vec3 m_PlayerRotation{ 30.0f, 45.0f, 0 };
-		glm::vec2 m_PlayerVelocity{ 0, 0 };
+		glm::vec3 m_PlayerVelocity{ 0, 0, 0};
 
 		Camera m_Camera;
 

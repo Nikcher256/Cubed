@@ -51,4 +51,14 @@ namespace Cubed {
 		return ImGui::GetCurrentContext() ? (ImGui_ImplVulkan_InitInfo*)ImGui::GetIO().BackendRendererUserData : NULL;
 	}
 
+	uint32_t GetVulkanMemoryType(VkMemoryPropertyFlags properties, uint32_t type_bits)
+	{
+		VkPhysicalDevice physicalDevice = Cubed::GetVulkanInfo()->PhysicalDevice;
+		VkPhysicalDeviceMemoryProperties prop;
+		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &prop);
+		for (uint32_t i = 0; i < prop.memoryTypeCount; i++)
+			if ((prop.memoryTypes[i].propertyFlags & properties) == properties && type_bits & (1 << i))
+				return i;
+		return 0xFFFFFFFF; // Unable to find memoryType
+	}
 }

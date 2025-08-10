@@ -13,6 +13,7 @@ namespace vkb {
 
 namespace Cubed {
 	ImGui_ImplVulkan_InitInfo* GetVulkanInfo();
+	uint32_t GetVulkanMemoryType(VkMemoryPropertyFlags properties, uint32_t type_bits);
 }
 
 #define VK_CHECK(x)                                                                    \

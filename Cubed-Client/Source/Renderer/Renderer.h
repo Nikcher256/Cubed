@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Vulkan.h"
-#include "Texture.h"
 #include <filesystem>
 #include <glm/glm.hpp>
 
@@ -28,6 +27,7 @@ namespace Cubed {
 		glm::vec3 Rotation{ 0, 0, 0 };
 	};
 
+
 	class Renderer
 	{
 	public:
@@ -37,31 +37,59 @@ namespace Cubed {
 		void BeginScene(const Camera& camera);
 		void EndScene();
 
-		void RenderCube(const glm::vec3& position, const glm::vec3& rotation);
+		void RenderCube(const glm::vec3& position, const glm::vec3& rotation, int textureIndex);
 		void RenderUI();
-	public:
-		static uint32_t GetVulkanMemoryType(VkMemoryPropertyFlags properties, uint32_t type_bits);
+		void OnSwapchainRecreated();
+
 	private:
 		VkShaderModule loadShader(const std::filesystem::path& path);
 		void InitPipeline();
+		void CreateRenderPass();
+		void CreateDepthResources();
+		void CreateFramebuffers();
 		void InitBuffers();
 		void CreateOrResizeBuffer(Buffer& buffer, uint64_t newSize);
+
+		void DestroyPipeline();
+		void DestroyFramebuffers();
+		void DestroyDepthResources();
+		void DestroyRenderPass();
+
+		
 	private:
 		//buffers, pipelines
 		VkPipeline m_GraphicsPipeline = nullptr;
 		VkPipelineLayout m_PipelineLayout = nullptr;
 
-		VkDescriptorSetLayout m_DescriptorSetLayout = nullptr;
-		VkDescriptorSet m_DescriptorSet = nullptr;
+		VkDescriptorSetLayout m_TexturesDescriptorSetLayout = nullptr;
+		VkDescriptorSetLayout m_CameraDescriptorSetLayout = nullptr;
+		VkDescriptorSet m_TexturesDescriptorSet = nullptr;
+		VkDescriptorSet m_CameraDescriptorSet = nullptr;
 
-		Buffer m_VertexBuffer, m_IndexBuffer;
+		Buffer m_VertexBuffer, m_IndexBuffer, m_CameraUBO;
 
 		struct PushConstants
 		{
-			glm::mat4 ViewProjection;
 			glm::mat4 Transform;
+			int TextureIndex = 0;
+			int _pad[3];
 		} m_PushConstants;
 
-		std::shared_ptr<Texture> m_Texture;
+		struct CameraUBO {
+			glm::mat4 ViewProjection;
+		} m_CameraData;
+
+
+		struct DepthResource {
+			VkImage image = VK_NULL_HANDLE;
+			VkDeviceMemory memory = VK_NULL_HANDLE;
+			VkImageView view = VK_NULL_HANDLE;
+		};
+
+		VkRenderPass m_RenderPass = VK_NULL_HANDLE;
+		VkFormat     m_DepthFormat = VK_FORMAT_UNDEFINED;
+		std::vector<DepthResource> m_Depth;
+		std::vector<VkFramebuffer> m_Framebuffers;
+
 	};
 }

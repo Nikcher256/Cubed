@@ -11,150 +11,235 @@
 #include "Walnut/Application.h"
 #include "Walnut/Core/Log.h"
 #include "../../../Walnut/vendor/stb_image/stb_image.h"
+#include "../Assets/TextureManager.h"
 
 namespace Cubed {
 
-	uint32_t Renderer::GetVulkanMemoryType(VkMemoryPropertyFlags properties, uint32_t type_bits)
-	{
-		VkPhysicalDevice physicalDevice = Cubed::GetVulkanInfo()->PhysicalDevice;
-		VkPhysicalDeviceMemoryProperties prop;
-		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &prop);
-		for (uint32_t i = 0; i < prop.memoryTypeCount; i++)
-			if ((prop.memoryTypes[i].propertyFlags & properties) == properties && type_bits & (1 << i))
-				return i;
-		return 0xFFFFFFFF; // Unable to find memoryType
-	}
 
 	void Renderer::Init()
 	{
 		const std::filesystem::path TEXTURE_BASE_PATH = "C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Textures";
-		int texWidth, texHeight, texChannels;
-		stbi_uc* pixels = stbi_load((TEXTURE_BASE_PATH / "simple.png").string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-		if (!pixels) {
-			throw std::runtime_error("Failed to load texture image!");
-		}
-
-		uint32_t color = 0xFFFF00FF;
-		m_Texture = std::make_shared<Texture>(
-			texWidth,
-			texHeight,
-			Walnut::Buffer(pixels, texWidth * texHeight * 4) // 4 bytes per pixel
-		);
-
-		stbi_image_free(pixels);
+		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "simple.png");
+		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "man.png");
 
 		VkDevice device = GetVulkanInfo()->Device;
 
 		//VkSampler sampler[1] = { bd->FontSampler };
-		VkDescriptorSetLayoutBinding binding[1] = {};
-		binding[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		binding[0].descriptorCount = 1;
-		binding[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+		VkDescriptorSetLayoutBinding binding{};
+		binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		binding.descriptorCount = 2;
+		binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 		//binding[0].pImmutableSamplers = sampler;
 		VkDescriptorSetLayoutCreateInfo info = {};
 		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		info.bindingCount = 1;
-		info.pBindings = binding;
-		VK_CHECK(vkCreateDescriptorSetLayout(device, &info, nullptr, &m_DescriptorSetLayout));
+		info.pBindings = &binding;
+		VK_CHECK(vkCreateDescriptorSetLayout(device, &info, nullptr, &m_TexturesDescriptorSetLayout));
 
-		m_DescriptorSet = Walnut::Application::AllocateDescriptorSet(m_DescriptorSetLayout);
-		VkWriteDescriptorSet wds{};
-		wds.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		wds.descriptorCount = 1;
-		wds.dstSet = m_DescriptorSet;
-		wds.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		wds.dstBinding = 0;
-		VkDescriptorImageInfo imageInfo = m_Texture->GetImageInfo(); // ensure this returns a valid object
-		wds.pImageInfo = &imageInfo;
-		vkUpdateDescriptorSets(device, 1, &wds, 0, nullptr);
+		m_TexturesDescriptorSet = Walnut::Application::AllocateDescriptorSet(m_TexturesDescriptorSetLayout);
 
+		// prepare imageInfos array of size MAX_TEXTURES
+		std::vector<VkDescriptorImageInfo> imageInfos(2);
+		// fill imageInfos[i] for each loaded texture (imageView, sampler, layout)
+		imageInfos[0] = TextureManager::GetTexture(0)->GetImageInfo();
+		imageInfos[1] = TextureManager::GetTexture(0)->GetImageInfo();
+		// etc. for loaded textures, unused entries can point to a white 1x1 texture
+
+		VkWriteDescriptorSet write{};
+		write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		write.dstSet = m_TexturesDescriptorSet;
+		write.dstBinding = 0;
+		write.dstArrayElement = 0;
+		write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		write.descriptorCount = 2;
+		write.pImageInfo = imageInfos.data();
+
+		vkUpdateDescriptorSets(device, 1, &write, 0, nullptr);
+
+		VkDescriptorSetLayoutBinding uboBinding{};
+		uboBinding.binding = 0;
+		uboBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uboBinding.descriptorCount = 1;
+		uboBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		VkDescriptorSetLayoutCreateInfo uboLayoutInfo{};
+		uboLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		uboLayoutInfo.bindingCount = 1;
+		uboLayoutInfo.pBindings = &uboBinding;
+		vkCreateDescriptorSetLayout(device, &uboLayoutInfo, nullptr, &m_CameraDescriptorSetLayout);
+
+
+		m_CameraUBO.Usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+		CreateOrResizeBuffer(m_CameraUBO, sizeof(glm::mat4));
+
+		m_CameraDescriptorSet = Walnut::Application::AllocateDescriptorSet(m_CameraDescriptorSetLayout);
+
+		VkDescriptorBufferInfo bufInfo{};
+		bufInfo.buffer = m_CameraUBO.Handle;
+		bufInfo.offset = 0;
+		bufInfo.range = sizeof(CameraUBO);
+
+		VkWriteDescriptorSet uboWrite{};
+		uboWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		uboWrite.dstSet = m_CameraDescriptorSet;
+		uboWrite.dstBinding = 0;
+		uboWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		uboWrite.descriptorCount = 1;
+		uboWrite.pBufferInfo = &bufInfo;
+
+		vkUpdateDescriptorSets(device, 1, &uboWrite, 0, nullptr);
+
+		CreateRenderPass();
+		CreateDepthResources();
+		CreateFramebuffers();
 		InitBuffers();
 		InitPipeline();
 	}
 
-	void Renderer::Shutdown()
-	{
+
+	void Renderer::Shutdown() {
+		VkDevice device = GetVulkanInfo()->Device;
+		vkDeviceWaitIdle(device);
+
+		DestroyPipeline();
+		DestroyFramebuffers();
+		DestroyDepthResources();
+		DestroyRenderPass();
+		TextureManager::ClearCache();
+
+		// Buffers
+		if (m_VertexBuffer.Handle) { vkDestroyBuffer(device, m_VertexBuffer.Handle, nullptr); m_VertexBuffer.Handle = VK_NULL_HANDLE; }
+		if (m_VertexBuffer.Memory) { vkFreeMemory(device, m_VertexBuffer.Memory, nullptr);   m_VertexBuffer.Memory = VK_NULL_HANDLE; }
+		if (m_IndexBuffer.Handle) { vkDestroyBuffer(device, m_IndexBuffer.Handle, nullptr);  m_IndexBuffer.Handle = VK_NULL_HANDLE; }
+		if (m_IndexBuffer.Memory) { vkFreeMemory(device, m_IndexBuffer.Memory, nullptr);     m_IndexBuffer.Memory = VK_NULL_HANDLE; }
+		if (m_CameraUBO.Handle) { vkDestroyBuffer(device, m_CameraUBO.Handle, nullptr);    m_CameraUBO.Handle = VK_NULL_HANDLE; }
+		if (m_CameraUBO.Memory) { vkFreeMemory(device, m_CameraUBO.Memory, nullptr);       m_CameraUBO.Memory = VK_NULL_HANDLE; }
+
+		// Descriptor sets/layouts (optional to free sets if pool is reset elsewhere)
+		if (m_TexturesDescriptorSet) {
+			vkFreeDescriptorSets(device, Walnut::Application::GetDescriptorPool(), 1, &m_TexturesDescriptorSet);
+			m_TexturesDescriptorSet = VK_NULL_HANDLE;
+		}
+		if (m_CameraDescriptorSet) {
+			vkFreeDescriptorSets(device, Walnut::Application::GetDescriptorPool(), 1, &m_CameraDescriptorSet);
+			m_CameraDescriptorSet = VK_NULL_HANDLE;
+		}
+		if (m_TexturesDescriptorSetLayout) { vkDestroyDescriptorSetLayout(device, m_TexturesDescriptorSetLayout, nullptr); m_TexturesDescriptorSetLayout = VK_NULL_HANDLE; }
+		if (m_CameraDescriptorSetLayout) { vkDestroyDescriptorSetLayout(device, m_CameraDescriptorSetLayout, nullptr);   m_CameraDescriptorSetLayout = VK_NULL_HANDLE; }
+	}
+
+
+	// In Renderer.cpp
+	void Renderer::OnSwapchainRecreated() {
+		VkDevice device = GetVulkanInfo()->Device;
+		vkDeviceWaitIdle(device);
+
+		// Tear down swapchain-dependent stuff
+		DestroyPipeline();
+		DestroyFramebuffers();
+		DestroyDepthResources();
+		DestroyRenderPass();
+
+		// Recreate with the new wd->Width/Height/SurfaceFormat
+		CreateRenderPass();
+		CreateDepthResources();
+		CreateFramebuffers();
+		InitPipeline(); // pipeline references m_RenderPass, so rebuild it
+	}
+
+
+	// In Renderer.cpp
+	void Renderer::DestroyPipeline() {
+		VkDevice device = GetVulkanInfo()->Device;
+		if (m_GraphicsPipeline) { vkDestroyPipeline(device, m_GraphicsPipeline, nullptr); m_GraphicsPipeline = VK_NULL_HANDLE; }
+		if (m_PipelineLayout) { vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr); m_PipelineLayout = VK_NULL_HANDLE; }
+	}
+
+	void Renderer::DestroyFramebuffers() {
+		VkDevice device = GetVulkanInfo()->Device;
+		for (auto fb : m_Framebuffers)
+			if (fb) vkDestroyFramebuffer(device, fb, nullptr);
+		m_Framebuffers.clear();
+	}
+
+	void Renderer::DestroyDepthResources() {
+		VkDevice device = GetVulkanInfo()->Device;
+		for (auto& d : m_Depth) {
+			if (d.view) { vkDestroyImageView(device, d.view, nullptr);   d.view = VK_NULL_HANDLE; }
+			if (d.image) { vkDestroyImage(device, d.image, nullptr);      d.image = VK_NULL_HANDLE; }
+			if (d.memory) { vkFreeMemory(device, d.memory, nullptr);       d.memory = VK_NULL_HANDLE; }
+		}
+		m_Depth.clear();
+	}
+
+	void Renderer::DestroyRenderPass() {
+		VkDevice device = GetVulkanInfo()->Device;
+		if (m_RenderPass) { vkDestroyRenderPass(device, m_RenderPass, nullptr); m_RenderPass = VK_NULL_HANDLE; }
+	}
+
+
+	void Renderer::BeginScene(const Camera& camera) {
+		auto* wd = Walnut::Application::GetMainWindowData();
+		VkCommandBuffer cmd = Walnut::Application::GetActiveCommandBuffer();
 		VkDevice device = GetVulkanInfo()->Device;
 
-		// Destroy pipeline
-		if (m_GraphicsPipeline != VK_NULL_HANDLE)
-			vkDestroyPipeline(device, m_GraphicsPipeline, nullptr);
+		// --- update camera UBO (your code) ---
+		float w = (float)wd->Width, h = (float)wd->Height;
+		glm::mat4 camXf = glm::translate(glm::mat4(1.0f), camera.Position) *
+			glm::eulerAngleXYZ(glm::radians(camera.Rotation.x),
+				glm::radians(camera.Rotation.y),
+				glm::radians(camera.Rotation.z));
+		m_CameraData.ViewProjection =
+			glm::perspectiveRH_ZO(glm::radians(45.0f), w / h, 0.1f, 1000.0f) * glm::inverse(camXf);
 
-		// Destroy pipeline layout
-		if (m_PipelineLayout != VK_NULL_HANDLE)
-			vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
+		void* data;
+		vkMapMemory(device, m_CameraUBO.Memory, 0, sizeof(m_CameraData), 0, &data);
+		memcpy(data, &m_CameraData, sizeof(m_CameraData));
+		vkUnmapMemory(device, m_CameraUBO.Memory);
 
-		// Destroy vertex buffer and free memory
-		if (m_VertexBuffer.Handle != VK_NULL_HANDLE)
-			vkDestroyBuffer(device, m_VertexBuffer.Handle, nullptr);
-		if (m_VertexBuffer.Memory != VK_NULL_HANDLE)
-			vkFreeMemory(device, m_VertexBuffer.Memory, nullptr);
+		// --- begin your render pass ---
+		uint32_t frameIndex = wd->FrameIndex;
 
-		// Destroy index buffer and free memory
-		if (m_IndexBuffer.Handle != VK_NULL_HANDLE)
-			vkDestroyBuffer(device, m_IndexBuffer.Handle, nullptr);
-		if (m_IndexBuffer.Memory != VK_NULL_HANDLE)
-			vkFreeMemory(device, m_IndexBuffer.Memory, nullptr);
+		VkClearValue clears[2];
+        clears[0].color = { {0.53f, 0.81f, 0.98f, 1.0f} };
+		clears[1].depthStencil = { 1.0f, 0 };
 
-		// Destroy descriptor set layout
-		if (m_DescriptorSetLayout != VK_NULL_HANDLE)
-			vkDestroyDescriptorSetLayout(device, m_DescriptorSetLayout, nullptr);
-		if (m_DescriptorSet != VK_NULL_HANDLE)
-			vkFreeDescriptorSets(device, Walnut::Application::GetDescriptorPool(), 1, &m_DescriptorSet);
+		VkRenderPassBeginInfo rp{ VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+		rp.renderPass = m_RenderPass;
+		rp.framebuffer = m_Framebuffers[frameIndex];
+		rp.renderArea.offset = { 0,0 };
+		rp.renderArea.extent = { (uint32_t)wd->Width, (uint32_t)wd->Height };
+		rp.clearValueCount = 2;
+		rp.pClearValues = clears;
 
-		m_GraphicsPipeline = VK_NULL_HANDLE;
-		m_PipelineLayout = VK_NULL_HANDLE;
-		m_VertexBuffer = {};
-		m_IndexBuffer = {};
+		vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
+
+		VkViewport vp{ 0, (float)wd->Height, (float)wd->Width, -(float)wd->Height, 0.0f, 1.0f };
+		vkCmdSetViewport(cmd, 0, 1, &vp);
+		VkRect2D sc{ {0,0}, { (uint32_t)wd->Width, (uint32_t)wd->Height } };
+		vkCmdSetScissor(cmd, 0, 1, &sc);
 	}
 
-	void Renderer::BeginScene(const Camera& camera)
-	{
-		auto wd = Walnut::Application::GetMainWindowData();
-
-		float viewportWidth = static_cast<float>(wd->Width);
-		float viewportHeight = static_cast<float>(wd->Height);
-
-		VkCommandBuffer commandBuffer = Walnut::Application::GetActiveCommandBuffer();
-
-		glm::mat4 cameraTransform = glm::translate(glm::mat4(1.0f), camera.Position) *
-			glm::eulerAngleXYZ(glm::radians(camera.Rotation.x), glm::radians(camera.Rotation.y), glm::radians(camera.Rotation.z));;
-		m_PushConstants.ViewProjection = glm::perspectiveFov(glm::radians(45.0f), viewportWidth, viewportHeight, 0.1f, 1000.0f)
-			* glm::inverse(cameraTransform);
-
-
-		VkViewport vp{
-			.y = viewportHeight,
-			.width = viewportWidth,
-			.height = -viewportHeight,
-			.minDepth = 0.0f,
-			.maxDepth = 1.0f };
-		// Set viewport dynamically
-		vkCmdSetViewport(commandBuffer, 0, 1, &vp);
-
-		VkRect2D scissor{
-			.extent = {.width = (uint32_t)wd->Width, .height = (uint32_t)wd->Height} };
-		// Set scissor dynamically
-		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	void Renderer::EndScene() {
+		VkCommandBuffer cmd = Walnut::Application::GetActiveCommandBuffer();
+		vkCmdEndRenderPass(cmd);
 	}
 
-	void Renderer::EndScene()
-	{
-
-	}
-
-	void Renderer::RenderCube(const glm::vec3& position, const glm::vec3& rotation)
+	void Renderer::RenderCube(const glm::vec3& position, const glm::vec3& rotation, int textureIndex)
 	{
 		glm::vec3 translation = position;
 
 		m_PushConstants.Transform = glm::translate(glm::mat4(1.0f), translation) *
 			glm::eulerAngleXYZ(glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
+		m_PushConstants.TextureIndex = textureIndex;
 
 		VkCommandBuffer commandBuffer = Walnut::Application::GetActiveCommandBuffer();
 
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
 
-		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
+		VkDescriptorSet sets[] = { m_TexturesDescriptorSet, m_CameraDescriptorSet };
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout,
+			0, 2, sets, 0, nullptr);
 
 		vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstants), &m_PushConstants);
 
@@ -169,23 +254,180 @@ namespace Cubed {
 		
 	}
 
+	void Renderer::CreateDepthResources() {
+		auto* wd = Walnut::Application::GetMainWindowData();
+		VkDevice device = GetVulkanInfo()->Device;
+
+		m_Depth.resize(wd->ImageCount);
+
+		for (uint32_t i = 0; i < wd->ImageCount; ++i) {
+			VkImageCreateInfo ici{ VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO };
+			ici.imageType = VK_IMAGE_TYPE_2D;
+			ici.format = m_DepthFormat;
+			ici.extent = { (uint32_t)wd->Width, (uint32_t)wd->Height, 1 };
+			ici.mipLevels = 1;
+			ici.arrayLayers = 1;
+			ici.samples = VK_SAMPLE_COUNT_1_BIT;
+			ici.tiling = VK_IMAGE_TILING_OPTIMAL;
+			ici.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+			VK_CHECK(vkCreateImage(device, &ici, nullptr, &m_Depth[i].image));
+
+			VkMemoryRequirements req{};
+			vkGetImageMemoryRequirements(device, m_Depth[i].image, &req);
+
+			VkMemoryAllocateInfo mai{ VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO };
+			mai.allocationSize = req.size;
+			mai.memoryTypeIndex = GetVulkanMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, req.memoryTypeBits);
+			VK_CHECK(vkAllocateMemory(device, &mai, nullptr, &m_Depth[i].memory));
+			VK_CHECK(vkBindImageMemory(device, m_Depth[i].image, m_Depth[i].memory, 0));
+
+			VkImageViewCreateInfo iv{ VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO };
+			iv.image = m_Depth[i].image;
+			iv.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			iv.format = m_DepthFormat;
+			iv.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+			iv.subresourceRange.levelCount = 1;
+			iv.subresourceRange.layerCount = 1;
+			VK_CHECK(vkCreateImageView(device, &iv, nullptr, &m_Depth[i].view));
+		}
+	}
+
+
+	void Renderer::CreateFramebuffers() {
+		auto* wd = Walnut::Application::GetMainWindowData();
+		VkDevice device = GetVulkanInfo()->Device;
+
+		m_Framebuffers.resize(wd->ImageCount);
+
+		for (uint32_t i = 0; i < wd->ImageCount; ++i) {
+			VkImageView attachments[2] = {
+				wd->Frames[i].BackbufferView, // color
+				m_Depth[i].view               // depth
+			};
+
+			VkFramebufferCreateInfo fbi{ VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO };
+			fbi.renderPass = m_RenderPass;
+			fbi.attachmentCount = 2;
+			fbi.pAttachments = attachments;
+			fbi.width = (uint32_t)wd->Width;
+			fbi.height = (uint32_t)wd->Height;
+			fbi.layers = 1;
+
+			VK_CHECK(vkCreateFramebuffer(device, &fbi, nullptr, &m_Framebuffers[i]));
+		}
+	}
+
+
+	void Renderer::CreateRenderPass()
+	{
+		VkDevice device = GetVulkanInfo()->Device;
+
+		VkSurfaceFormatKHR surfaceFormat = Walnut::Application::GetMainWindowData()->SurfaceFormat;
+
+		// Color attachment (swapchain image format)
+		VkAttachmentDescription colorAttachment{};
+		// Renderer::CreateRenderPass()
+		colorAttachment.format = surfaceFormat.format;
+		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;           // clear scene background
+		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;          // fresh image each frame
+		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		VkPhysicalDevice physicalDevice = GetVulkanInfo()->PhysicalDevice;
+
+		VkFormat candidates[] = {
+			VK_FORMAT_D32_SFLOAT,
+			VK_FORMAT_D32_SFLOAT_S8_UINT,
+			VK_FORMAT_D24_UNORM_S8_UINT
+		};
+
+		m_DepthFormat = VK_FORMAT_UNDEFINED;
+
+		for (VkFormat format : candidates) {
+			VkFormatProperties props;
+			vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+			if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+				m_DepthFormat = format;
+				break;
+			}
+		}
+
+		// Use depthFormat for depthAttachment.format
+
+
+		// Depth attachment (typical depth format)
+		VkAttachmentDescription depthAttachment{};
+		depthAttachment.format = m_DepthFormat; // Make sure this format is supported on your GPU!
+		depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+		depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;  // Clear depth at start
+		depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // No need to store depth
+		depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		// Attachment references for the subpass
+		VkAttachmentReference colorAttachmentRef{};
+		colorAttachmentRef.attachment = 0; // index in attachment descriptions array
+		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		VkAttachmentReference depthAttachmentRef{};
+		depthAttachmentRef.attachment = 1; // second attachment
+		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		// Subpass description
+		VkSubpassDescription subpass{};
+		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.colorAttachmentCount = 1;
+		subpass.pColorAttachments = &colorAttachmentRef;
+		subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+		// Subpass dependency to handle layout transitions and synchronization
+		VkSubpassDependency dependency{};
+		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependency.dstSubpass = 0;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.srcAccessMask = 0;
+		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+		// Create render pass info
+		std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
+
+		VkRenderPassCreateInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+		renderPassInfo.pAttachments = attachments.data();
+		renderPassInfo.subpassCount = 1;
+		renderPassInfo.pSubpasses = &subpass;
+		renderPassInfo.dependencyCount = 1;
+		renderPassInfo.pDependencies = &dependency;
+
+		VK_CHECK(vkCreateRenderPass(device, &renderPassInfo, nullptr, &m_RenderPass));
+	}
+
+
 	void Renderer::InitPipeline()
 	{
 
 		VkDevice device = GetVulkanInfo()->Device;
-
-		VkRenderPass renderPass = Walnut::Application::GetMainWindowData()->RenderPass; 
 		
+		VkDescriptorSetLayout setLayouts[2] = { m_TexturesDescriptorSetLayout, m_CameraDescriptorSetLayout };
+
 		std::array<VkPushConstantRange, 1> pushConstantRanges;
 		pushConstantRanges[0].offset = 0;
-		pushConstantRanges[0].size = sizeof(glm::mat4) * 2;
-		pushConstantRanges[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+		pushConstantRanges[0].size = sizeof(PushConstants);
+		pushConstantRanges[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
 		VkPipelineLayoutCreateInfo layout_info{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
 		layout_info.pPushConstantRanges = pushConstantRanges.data();
 		layout_info.pushConstantRangeCount = (uint32_t)pushConstantRanges.size();
-		layout_info.setLayoutCount = 1;
-		layout_info.pSetLayouts = &m_DescriptorSetLayout;
+		layout_info.setLayoutCount = 2;
+		layout_info.pSetLayouts = setLayouts;
 		VK_CHECK(vkCreatePipelineLayout(device, &layout_info, nullptr, &m_PipelineLayout));
 
 		std::array<VkVertexInputBindingDescription, 1> binding_desc;
@@ -247,9 +489,13 @@ namespace Cubed {
 			.viewportCount = 1,
 			.scissorCount = 1 };
 
-		// Disable all depth testing.
-		VkPipelineDepthStencilStateCreateInfo depth_stencil{
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO };
+		VkPipelineDepthStencilStateCreateInfo depth_stencil{};
+		depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+		depth_stencil.depthTestEnable = VK_TRUE;
+		depth_stencil.depthWriteEnable = VK_TRUE;
+		depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS; // Standard depth test
+		depth_stencil.depthBoundsTestEnable = VK_FALSE;
+		depth_stencil.stencilTestEnable = VK_FALSE;
 
 		// No multisampling.
 		VkPipelineMultisampleStateCreateInfo multisample{
@@ -300,7 +546,7 @@ namespace Cubed {
 			.pColorBlendState = &blend,
 			.pDynamicState = &dynamic,
 			.layout = m_PipelineLayout,        // We need to specify the pipeline layout up front
-			.renderPass = renderPass             // We need to specify the render pass up front
+			.renderPass = m_RenderPass             // We need to specify the render pass up front
 		};
 
 		VK_CHECK(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipe, nullptr, &m_GraphicsPipeline));

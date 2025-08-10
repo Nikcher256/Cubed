@@ -40,39 +40,65 @@ namespace Cubed {
 
 	void ClientLayer::OnUpdate(float ts)
 	{
-		glm::vec2 dir{ 0.0f, 0.0f };
-		if (Walnut::Input::IsKeyDown(Walnut::KeyCode::W))
-			dir.y = -1;
-		else if (Walnut::Input::IsKeyDown(Walnut::KeyCode::S))
-			dir.y = 1;
+		// --- Input ---
+		// Horizontal plane (XZ) from WASD
+		glm::vec2 dirXZ{ 0.0f, 0.0f };
+		if (Walnut::Input::IsKeyDown(Walnut::KeyCode::W)) dirXZ.y = -1.0f;
+		else if (Walnut::Input::IsKeyDown(Walnut::KeyCode::S)) dirXZ.y = 1.0f;
 
-		if (Walnut::Input::IsKeyDown(Walnut::KeyCode::A))
-			dir.x = -1;
-		else if (Walnut::Input::IsKeyDown(Walnut::KeyCode::D))
-			dir.x = 1;
-		
+		if (Walnut::Input::IsKeyDown(Walnut::KeyCode::A)) dirXZ.x = -1.0f;
+		else if (Walnut::Input::IsKeyDown(Walnut::KeyCode::D)) dirXZ.x = 1.0f;
 
-		if (glm::length(dir) > 0.0f) 
+		// Vertical (Y) from Q/E — E up, Q down
+		float dirY = 0.0f;
+		if (Walnut::Input::IsKeyDown(Walnut::KeyCode::E)) dirY += 1.0f;
+		if (Walnut::Input::IsKeyDown(Walnut::KeyCode::Q)) dirY -= 1.0f;
+
+		// --- Build desired velocity from input ---
+		const float speed = 5.0f;
+
+		glm::vec3 desiredVel{ 0.0f };
+		if (glm::length(dirXZ) > 0.0f)
 		{
-			const float speed = 5.0f;
-			// Optional (for game play reasons?)
-			dir = glm::normalize(dir);
-			m_PlayerVelocity = dir * speed;
+			dirXZ = glm::normalize(dirXZ);
+			desiredVel += glm::vec3(dirXZ.x, 0.0f, dirXZ.y) * speed; // XZ
+		}
+		if (dirY != 0.0f)
+			desiredVel.y += dirY * speed; // Y
+
+		// If you want immediate response to keys, assign directly:
+		m_PlayerVelocity = desiredVel;
+
+		// --- Integrate ---
+		m_PlayerPosition += m_PlayerVelocity * ts;
+
+		// --- Damping (only when no input) ---
+		if (desiredVel == glm::vec3(0.0f))
+		{
+			// decay towards zero; clamp mix factor [0..1]
+			float k = glm::clamp(10.0f * ts, 0.0f, 1.0f);
+			m_PlayerVelocity = glm::mix(m_PlayerVelocity, glm::vec3(0.0f), k);
 		}
 
-		m_PlayerPosition += m_PlayerVelocity * ts;
-		m_PlayerVelocity = glm::mix(m_PlayerVelocity, glm::vec2(0.0f), 10.0f * ts);
 		m_PlayerRotation.y += 20.0f * ts;
 
+		// --- Networking: keep protocol 2D (XZ) for now ---
 		if (m_Client.GetConnectionStatus() == Walnut::Client::ConnectionStatus::Connected)
 		{
 			Walnut::BufferStreamWriter stream(s_ScratchBuffer);
 			stream.WriteRaw(PacketType::ClientUpdate);
-			stream.WriteRaw<glm::vec2>(m_PlayerPosition);
-			stream.WriteRaw<glm::vec2>(m_PlayerVelocity);
+
+			// Send XZ only (match server/PlayerData)
+			glm::vec2 pos2{ m_PlayerPosition.x, m_PlayerPosition.z };
+			glm::vec2 vel2{ m_PlayerVelocity.x, m_PlayerVelocity.z };
+			stream.WriteRaw<glm::vec2>(pos2);
+			stream.WriteRaw<glm::vec2>(vel2);
+
 			m_Client.SendBuffer(stream.GetBuffer());
 		}
 	}
+
+
 
 	void ClientLayer::OnUIRender()
 	{
@@ -145,28 +171,32 @@ namespace Cubed {
 
 	void ClientLayer::OnRender()
 	{
-
 		m_Renderer.BeginScene(m_Camera);
 
-		Walnut::Client::ConnectionStatus connectionStatus = m_Client.GetConnectionStatus();
-		//if (connectionStatus == Walnut::Client::ConnectionStatus::Connected)
-		{
-			uint32_t color = (m_PlayerID << 8) | 0xFF;
-			m_Renderer.RenderCube(glm::vec3(m_PlayerPosition.x, 0, m_PlayerPosition.y), m_PlayerRotation);
-			m_PlayerDataMutex.lock();
-			std::map<uint32_t, PlayerData> playerData = m_PlayerData;
-			m_PlayerDataMutex.unlock();
+		// Example anchor cube
+		m_Renderer.RenderCube(glm::vec3(0, 0, -5), m_PlayerRotation, 1);
 
-			for (const auto& [id, data] : playerData)
-			{
-				if (id == m_PlayerID)
-					continue;
-				color = (id << 8) | 0xFF;
-				m_Renderer.RenderCube(glm::vec3(data.Position.x, 0, data.Position.y), m_PlayerRotation);
-			}
+		// Local player: full 3D
+		m_Renderer.RenderCube(m_PlayerPosition, m_PlayerRotation, 0);
+
+		// Remote players: map (x, y) -> (x, 0, z)
+		m_PlayerDataMutex.lock();
+		std::map<uint32_t, PlayerData> playerData = m_PlayerData;
+		m_PlayerDataMutex.unlock();
+
+		for (const auto& [id, data] : playerData)
+		{
+			if (id == m_PlayerID) continue;
+			glm::vec3 pos3{ data.Position.x, 0.0f, data.Position.y };
+			m_Renderer.RenderCube(pos3, m_PlayerRotation, 0);
 		}
 
 		m_Renderer.EndScene();
+	}
 
+	void ClientLayer::OnSwapchainRecreated() {
+		m_Renderer.OnSwapchainRecreated();
 	}
 }
+
+

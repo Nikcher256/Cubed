@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include "Renderer.h"
 #include "Walnut/Application.h"
 
 namespace Cubed {
@@ -53,7 +52,7 @@ namespace Cubed {
 			VkMemoryAllocateInfo alloc_info = {};
 			alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 			alloc_info.allocationSize = req.size;
-			alloc_info.memoryTypeIndex = Renderer::GetVulkanMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, req.memoryTypeBits);
+			alloc_info.memoryTypeIndex = GetVulkanMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, req.memoryTypeBits);
 			VK_CHECK(vkAllocateMemory(device, &alloc_info, nullptr, &m_Memory));
 			VK_CHECK(vkBindImageMemory(device, m_Image, m_Memory, 0));
 		}
@@ -88,7 +87,7 @@ namespace Cubed {
 			VkMemoryAllocateInfo alloc_info = {};
 			alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 			alloc_info.allocationSize = req.size;
-			alloc_info.memoryTypeIndex = Renderer::GetVulkanMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, req.memoryTypeBits);
+			alloc_info.memoryTypeIndex = GetVulkanMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, req.memoryTypeBits);
 			VK_CHECK(vkAllocateMemory(device, &alloc_info, nullptr, &stagingBufferMemory));
 			VK_CHECK(vkBindBufferMemory(device, stagingBuffer, stagingBufferMemory, 0));
 		}
