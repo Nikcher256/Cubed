@@ -174,10 +174,12 @@ namespace Cubed {
 		m_Renderer.BeginScene(m_Camera);
 
 		// Example anchor cube
-		m_Renderer.RenderCube(glm::vec3(0, 0, -5), m_PlayerRotation, 1);
+		//m_Renderer.RenderCube(glm::vec3(0, 0, -5), m_PlayerRotation, 1);
 
 		// Local player: full 3D
-		m_Renderer.RenderCube(m_PlayerPosition, m_PlayerRotation, 0);
+		//m_Renderer.RenderCube(m_PlayerPosition, m_PlayerRotation, 0);
+
+		m_Renderer.RenderModels();
 
 		// Remote players: map (x, y) -> (x, 0, z)
 		m_PlayerDataMutex.lock();

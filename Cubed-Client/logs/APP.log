@@ -1,0 +1,267 @@
+[18:52:22] [info] APP: [CLIENT] [model] Mesh 'Base.003' using UV channel 0
+[18:52:22] [info] APP: [CLIENT] [model] Material 'body' slot BASE_COLOR -> '*0' (uvIndex=0)
+[18:52:22] [info] APP: [CLIENT] [model] Embedded tex *0  hint='png'  size=2872278  height=0
+[18:52:22] [info] APP: [CLIENT] [model] Mesh 'KAZ+SA.003' using UV channel 0
+[18:52:22] [info] APP: [CLIENT] [model] Material 'body' slot BASE_COLOR -> '*0' (uvIndex=0)
+[18:52:22] [info] APP: [CLIENT] [model] Embedded tex *0  hint='png'  size=2872278  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'RU_TanktrakR.010' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'tracks' slot BASE_COLOR -> '*3' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *3  hint='png'  size=220601  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'Kord_turret.010' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'kord' slot BASE_COLOR -> '*6' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *6  hint='png'  size=354363  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'RU_TanktrakL.010' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'tracks' slot BASE_COLOR -> '*3' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *3  hint='png'  size=220601  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'turret.010' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'body' slot BASE_COLOR -> '*0' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *0  hint='png'  size=2872278  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'KAZ_SA.003' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'body' slot BASE_COLOR -> '*0' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *0  hint='png'  size=2872278  height=0
+[18:52:23] [info] APP: [CLIENT] [Model Info] Mesh count: 7
+[18:52:23] [info] APP: [CLIENT]   Mesh(Base.003)0 - TextureIndex: 4 (texture loaded)
+[18:52:23] [info] APP: [CLIENT]   Mesh(KAZ+SA.003)1 - TextureIndex: 5 (texture loaded)
+[18:52:23] [info] APP: [CLIENT]   Mesh(RU_TanktrakR.010)2 - TextureIndex: 6 (texture loaded)
+[18:52:23] [info] APP: [CLIENT]   Mesh(Kord_turret.010)3 - TextureIndex: 7 (texture loaded)
+[18:52:23] [info] APP: [CLIENT]   Mesh(RU_TanktrakL.010)4 - TextureIndex: 8 (texture loaded)
+[18:52:23] [info] APP: [CLIENT]   Mesh(turret.010)5 - TextureIndex: 9 (texture loaded)
+[18:52:23] [info] APP: [CLIENT]   Mesh(KAZ_SA.003)6 - TextureIndex: 10 (texture loaded)
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'iris_mtl_miyako_iris_0' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'mtl_miyako_iris' slot BASE_COLOR -> '*0' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *0  hint='png'  size=104843  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'halo_mtl_miyako_halo_0' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'mtl_miyako_halo' slot BASE_COLOR -> '*2' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *2  hint='png'  size=103  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'halo.001_mtl_miyako_halo_0' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'mtl_miyako_halo' slot BASE_COLOR -> '*2' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *2  hint='png'  size=103  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'bodytight_mtl_miyako_bodytight_0' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'mtl_miyako_bodytight' slot BASE_COLOR -> '*3' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *3  hint='png'  size=93291  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'glove_mtl_miyako_bodytight_0' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'mtl_miyako_bodytight' slot BASE_COLOR -> '*3' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *3  hint='png'  size=93291  height=0
+[18:52:23] [info] APP: [CLIENT] [model] Mesh 'pocket_mtl_miyako_vest_0' using UV channel 0
+[18:52:23] [info] APP: [CLIENT] [model] Material 'mtl_miyako_vest' slot BASE_COLOR -> '*5' (uvIndex=0)
+[18:52:23] [info] APP: [CLIENT] [model] Embedded tex *5  hint='png'  size=130720  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'pocket2_mtl_miyako_vest_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_vest' slot BASE_COLOR -> '*5' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *5  hint='png'  size=130720  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'pocket2.001_mtl_miyako_vest_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_vest' slot BASE_COLOR -> '*5' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *5  hint='png'  size=130720  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'boot_mtl_miyako_boot_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_boot' slot BASE_COLOR -> '*7' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *7  hint='png'  size=55804  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'knee_mtl_miyako_knee_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_knee' slot BASE_COLOR -> '*10' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *10  hint='png'  size=42428  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'uniform_mtl_miyako_uniform_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_uniform' slot BASE_COLOR -> '*12' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *12  hint='png'  size=172527  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'sleeve_mtl_miyako_sleeve_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_sleeve' slot BASE_COLOR -> '*14' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *14  hint='png'  size=209602  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'sleeve_pad_mtl_miyako_sleeve_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_sleeve' slot BASE_COLOR -> '*14' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *14  hint='png'  size=209602  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'sleeve_pocket_mtl_miyako_sleeve_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_sleeve' slot BASE_COLOR -> '*14' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *14  hint='png'  size=209602  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'headset_mtl_miyako_headset_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_headset' slot BASE_COLOR -> '*16' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *16  hint='png'  size=98097  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'headset.001_mtl_miyako_headset_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_headset' slot BASE_COLOR -> '*16' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *16  hint='png'  size=98097  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'pocket2.002_mtl_miyako_vest_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_vest' slot BASE_COLOR -> '*5' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *5  hint='png'  size=130720  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'pocket3_mtl_miyako_vest_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_vest' slot BASE_COLOR -> '*5' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *5  hint='png'  size=130720  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'skirt_mtl_miyako_skirt_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_skirt' slot BASE_COLOR -> '*18' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *18  hint='png'  size=103550  height=0
+[18:52:24] [info] APP: [CLIENT] [model] Mesh 'vest_mtl_miyako_vest_0' using UV channel 0
+[18:52:24] [info] APP: [CLIENT] [model] Material 'mtl_miyako_vest' slot BASE_COLOR -> '*5' (uvIndex=0)
+[18:52:24] [info] APP: [CLIENT] [model] Embedded tex *5  hint='png'  size=130720  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'body_mtl_miyako_body_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_body' slot BASE_COLOR -> '*20' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *20  hint='png'  size=367521  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'body_mtl_miyako_face_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_face' slot BASE_COLOR -> '*22' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *22  hint='png'  size=181268  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'body_mtl_miyako_eyewhite_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_eyewhite' slot BASE_COLOR -> '*22' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *22  hint='png'  size=181268  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'body_mtl_miyako_brow_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_brow' slot BASE_COLOR -> '*24' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *24  hint='png'  size=1902  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'body_mtl_miyako_face_back_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_face_back' slot BASE_COLOR -> '*26' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *26  hint='png'  size=6686  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'hair_side_mtl_miyako_hair_ext_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_hair_ext' slot BASE_COLOR -> '*28' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *28  hint='png'  size=83210  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'hair_knot_mtl_miyako_hair_ext_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_hair_ext' slot BASE_COLOR -> '*28' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *28  hint='png'  size=83210  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'hair_inner_mtl_miyako_hair_inner_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_hair_inner' slot BASE_COLOR -> '*30' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *30  hint='png'  size=167162  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'hair_front_mtl_miyako_hair_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_hair' slot BASE_COLOR -> '*32' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *32  hint='png'  size=540937  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'hair_braid_mtl_miyako_hair_braid_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_hair_braid' slot BASE_COLOR -> '*34' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *34  hint='png'  size=71694  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'hair_back_mtl_miyako_hair_back_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_hair_back' slot BASE_COLOR -> '*36' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *36  hint='png'  size=366397  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'hair_inner_back_mtl_miyako_hair_inner_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] Material 'mtl_miyako_hair_inner' slot BASE_COLOR -> '*30' (uvIndex=0)
+[18:52:25] [info] APP: [CLIENT] [model] Embedded tex *30  hint='png'  size=167162  height=0
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'outline_mtl_outline_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] No texture found; using solid color (0.00,0.00,0.00,1.00)
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'outline_mtl_outline_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] No texture found; using solid color (0.00,0.00,0.00,1.00)
+[18:52:25] [info] APP: [CLIENT] [model] Mesh 'outline2_mtl_outline_0' using UV channel 0
+[18:52:25] [info] APP: [CLIENT] [model] No texture found; using solid color (0.00,0.00,0.00,1.00)
+[18:52:25] [info] APP: [CLIENT] [Model Info] Mesh count: 35
+[18:52:25] [info] APP: [CLIENT]   Mesh(iris_mtl_miyako_iris_0)0 - TextureIndex: 11 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(halo_mtl_miyako_halo_0)1 - TextureIndex: 12 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(halo.001_mtl_miyako_halo_0)2 - TextureIndex: 13 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(bodytight_mtl_miyako_bodytight_0)3 - TextureIndex: 14 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(glove_mtl_miyako_bodytight_0)4 - TextureIndex: 15 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(pocket_mtl_miyako_vest_0)5 - TextureIndex: 16 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(pocket2_mtl_miyako_vest_0)6 - TextureIndex: 17 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(pocket2.001_mtl_miyako_vest_0)7 - TextureIndex: 18 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(boot_mtl_miyako_boot_0)8 - TextureIndex: 19 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(knee_mtl_miyako_knee_0)9 - TextureIndex: 20 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(uniform_mtl_miyako_uniform_0)10 - TextureIndex: 21 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(sleeve_mtl_miyako_sleeve_0)11 - TextureIndex: 22 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(sleeve_pad_mtl_miyako_sleeve_0)12 - TextureIndex: 23 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(sleeve_pocket_mtl_miyako_sleeve_0)13 - TextureIndex: 24 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(headset_mtl_miyako_headset_0)14 - TextureIndex: 25 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(headset.001_mtl_miyako_headset_0)15 - TextureIndex: 26 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(pocket2.002_mtl_miyako_vest_0)16 - TextureIndex: 27 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(pocket3_mtl_miyako_vest_0)17 - TextureIndex: 28 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(skirt_mtl_miyako_skirt_0)18 - TextureIndex: 29 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(vest_mtl_miyako_vest_0)19 - TextureIndex: 30 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(body_mtl_miyako_body_0)20 - TextureIndex: 31 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(body_mtl_miyako_face_0)21 - TextureIndex: 32 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(body_mtl_miyako_eyewhite_0)22 - TextureIndex: 33 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(body_mtl_miyako_brow_0)23 - TextureIndex: 34 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(body_mtl_miyako_face_back_0)24 - TextureIndex: 35 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(hair_side_mtl_miyako_hair_ext_0)25 - TextureIndex: 36 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(hair_knot_mtl_miyako_hair_ext_0)26 - TextureIndex: 37 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(hair_inner_mtl_miyako_hair_inner_0)27 - TextureIndex: 38 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(hair_front_mtl_miyako_hair_0)28 - TextureIndex: 39 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(hair_braid_mtl_miyako_hair_braid_0)29 - TextureIndex: 40 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(hair_back_mtl_miyako_hair_back_0)30 - TextureIndex: 41 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(hair_inner_back_mtl_miyako_hair_inner_0)31 - TextureIndex: 42 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(outline_mtl_outline_0)32 - TextureIndex: 43 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(outline_mtl_outline_0)33 - TextureIndex: 44 (texture loaded)
+[18:52:25] [info] APP: [CLIENT]   Mesh(outline2_mtl_outline_0)34 - TextureIndex: 45 (texture loaded)
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING normal texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture
+[18:52:25] [info] APP: [CLIENT] USING 0 texture

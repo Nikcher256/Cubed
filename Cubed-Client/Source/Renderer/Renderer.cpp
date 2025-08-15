@@ -13,88 +13,155 @@
 #include "../../../Walnut/vendor/stb_image/stb_image.h"
 #include "../Assets/TextureManager.h"
 
+
+
 namespace Cubed {
 
 
 	void Renderer::Init()
 	{
+		// Base textures
 		const std::filesystem::path TEXTURE_BASE_PATH = "C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Textures";
-		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "simple.png");
-		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "man.png");
+		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "simple.png"); // id 0
+		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "man.png");    // id 1
 
-		VkDevice device = GetVulkanInfo()->Device;
+		// Load model first (so we know max texture index)
+		auto model = Cubed::ModelManager::Load(
+			"C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/tank.glb"
+		);
+		model->SetSizeMeters(4.0f); // Set size to 1 meter
+		model->SetRotation(180.0f, glm::vec3(0, 1, 0)); // Rotate 90 degrees around Y-axis
+		model->SetPosition(glm::vec3(0, -2, 0)); // Center position
 
-		//VkSampler sampler[1] = { bd->FontSampler };
-		VkDescriptorSetLayoutBinding binding{};
-		binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		binding.descriptorCount = 2;
-		binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		//binding[0].pImmutableSamplers = sampler;
-		VkDescriptorSetLayoutCreateInfo info = {};
-		info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		info.bindingCount = 1;
-		info.pBindings = &binding;
-		VK_CHECK(vkCreateDescriptorSetLayout(device, &info, nullptr, &m_TexturesDescriptorSetLayout));
+		AddModel(model);
 
-		m_TexturesDescriptorSet = Walnut::Application::AllocateDescriptorSet(m_TexturesDescriptorSetLayout);
+		auto model1 = Cubed::ModelManager::Load(
+			"C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/miyako.glb"
+		);
+		model1->SetSizeMeters(4.0f); // Set size to 1 meter
+		//model1->SetRotation(-90.0f, glm::vec3(0, 1, 0)); // Rotate 90 degrees around Y-axis
+		model1->SetPosition(glm::vec3(4, -2, 0)); // Center position
 
-		// prepare imageInfos array of size MAX_TEXTURES
-		std::vector<VkDescriptorImageInfo> imageInfos(2);
-		// fill imageInfos[i] for each loaded texture (imageView, sampler, layout)
-		imageInfos[0] = TextureManager::GetTexture(0)->GetImageInfo();
-		imageInfos[1] = TextureManager::GetTexture(0)->GetImageInfo();
-		// etc. for loaded textures, unused entries can point to a white 1x1 texture
+		AddModel(model1);
 
-		VkWriteDescriptorSet write{};
-		write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		write.dstSet = m_TexturesDescriptorSet;
-		write.dstBinding = 0;
-		write.dstArrayElement = 0;
-		write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		write.descriptorCount = 2;
-		write.pImageInfo = imageInfos.data();
+		// Log model info
+		LogModelInfo(model);
 
-		vkUpdateDescriptorSets(device, 1, &write, 0, nullptr);
+		// Find max texture ID across all models
+		uint32_t maxTexId = 0;
+		for (auto& m : m_Models)
+			for (auto& mesh : m->GetMeshes())
+				if (mesh.TextureIndex > maxTexId) maxTexId = mesh.TextureIndex;
 
-		VkDescriptorSetLayoutBinding uboBinding{};
-		uboBinding.binding = 0;
-		uboBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uboBinding.descriptorCount = 1;
-		uboBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		// Create descriptor sets
+		CreateTextureDescriptorSet(maxTexId);
+		CreateCameraDescriptorSet();
 
-		VkDescriptorSetLayoutCreateInfo uboLayoutInfo{};
-		uboLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		uboLayoutInfo.bindingCount = 1;
-		uboLayoutInfo.pBindings = &uboBinding;
-		vkCreateDescriptorSetLayout(device, &uboLayoutInfo, nullptr, &m_CameraDescriptorSetLayout);
-
-
-		m_CameraUBO.Usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-		CreateOrResizeBuffer(m_CameraUBO, sizeof(glm::mat4));
-
-		m_CameraDescriptorSet = Walnut::Application::AllocateDescriptorSet(m_CameraDescriptorSetLayout);
-
-		VkDescriptorBufferInfo bufInfo{};
-		bufInfo.buffer = m_CameraUBO.Handle;
-		bufInfo.offset = 0;
-		bufInfo.range = sizeof(CameraUBO);
-
-		VkWriteDescriptorSet uboWrite{};
-		uboWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		uboWrite.dstSet = m_CameraDescriptorSet;
-		uboWrite.dstBinding = 0;
-		uboWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		uboWrite.descriptorCount = 1;
-		uboWrite.pBufferInfo = &bufInfo;
-
-		vkUpdateDescriptorSets(device, 1, &uboWrite, 0, nullptr);
-
+		// Render infra
 		CreateRenderPass();
 		CreateDepthResources();
 		CreateFramebuffers();
 		InitBuffers();
 		InitPipeline();
 	}
+
+	void Renderer::CreateTextureDescriptorSet(uint32_t maxTexId)
+	{
+		VkDevice device = GetVulkanInfo()->Device;
+		static constexpr uint32_t MAX_TEXTURES = 100;
+
+		// Layout for texture array
+		VkDescriptorSetLayoutBinding texBinding{};
+		texBinding.binding = 0;
+		texBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		texBinding.descriptorCount = MAX_TEXTURES;
+		texBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		VkDescriptorSetLayoutCreateInfo texLayoutInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
+		texLayoutInfo.bindingCount = 1;
+		texLayoutInfo.pBindings = &texBinding;
+		VK_CHECK(vkCreateDescriptorSetLayout(device, &texLayoutInfo, nullptr, &m_TexturesDescriptorSetLayout));
+
+		m_TexturesDescriptorSet = Walnut::Application::AllocateDescriptorSet(m_TexturesDescriptorSetLayout);
+
+		// Fill descriptors
+		std::vector<VkDescriptorImageInfo> imageInfos(MAX_TEXTURES);
+		for (uint32_t i = 0; i < MAX_TEXTURES; ++i) {
+			if (i < TextureManager::Count()) {
+				imageInfos[i] = TextureManager::GetTexture(i)->GetImageInfo();
+				WL_INFO_TAG("CLIENT", "USING normal texture");
+			}
+			else
+			{ 
+				WL_INFO_TAG("CLIENT", "USING 0 texture");
+				imageInfos[i] = TextureManager::GetTexture(0)->GetImageInfo();
+			}
+		}
+
+		VkWriteDescriptorSet texWrite{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+		texWrite.dstSet = m_TexturesDescriptorSet;
+		texWrite.dstBinding = 0;
+		texWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		texWrite.descriptorCount = MAX_TEXTURES;
+		texWrite.pImageInfo = imageInfos.data();
+		vkUpdateDescriptorSets(device, 1, &texWrite, 0, nullptr);
+	}
+
+	void Renderer::CreateCameraDescriptorSet()
+	{
+		VkDevice device = GetVulkanInfo()->Device;
+
+		// Layout
+		VkDescriptorSetLayoutBinding camBinding{};
+		camBinding.binding = 0;
+		camBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		camBinding.descriptorCount = 1;
+		camBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		VkDescriptorSetLayoutCreateInfo camLayoutInfo{ VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO };
+		camLayoutInfo.bindingCount = 1;
+		camLayoutInfo.pBindings = &camBinding;
+		VK_CHECK(vkCreateDescriptorSetLayout(device, &camLayoutInfo, nullptr, &m_CameraDescriptorSetLayout));
+
+		// Buffer
+		m_CameraUBO.Usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+		CreateOrResizeBuffer(m_CameraUBO, sizeof(m_CameraData));
+
+		// Descriptor set
+		m_CameraDescriptorSet = Walnut::Application::AllocateDescriptorSet(m_CameraDescriptorSetLayout);
+
+		// Write descriptor
+		VkDescriptorBufferInfo camBufInfo{};
+		camBufInfo.buffer = m_CameraUBO.Handle;
+		camBufInfo.offset = 0;
+		camBufInfo.range = sizeof(m_CameraData);
+
+		VkWriteDescriptorSet camWrite{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET };
+		camWrite.dstSet = m_CameraDescriptorSet;
+		camWrite.dstBinding = 0;
+		camWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		camWrite.descriptorCount = 1;
+		camWrite.pBufferInfo = &camBufInfo;
+		vkUpdateDescriptorSets(device, 1, &camWrite, 0, nullptr);
+	}
+
+	void Renderer::LogModelInfo(const std::shared_ptr<Cubed::Model>& model)
+	{
+		const auto& meshes = model->GetMeshes();
+		std::cout << "[Model Info] Mesh count: " << meshes.size() << "\n";
+		for (size_t i = 0; i < meshes.size(); ++i) {
+			std::cout << "  Mesh(" << meshes[i].Name << ")" << i
+				<< " - TextureIndex: " << meshes[i].TextureIndex;
+			if (meshes[i].TextureIndex < TextureManager::Count()) {
+				auto tex = TextureManager::GetTexture(meshes[i].TextureIndex);
+				std::cout << " (texture loaded)\n";
+			}
+			else {
+				std::cout << " (no texture)\n";
+			}
+		}
+	}
+
 
 
 	void Renderer::Shutdown() {
@@ -106,6 +173,10 @@ namespace Cubed {
 		DestroyDepthResources();
 		DestroyRenderPass();
 		TextureManager::ClearCache();
+		for (auto& model : m_Models) {
+			model->DestroyGPU();
+		}
+		ModelManager::Clear();
 
 		// Buffers
 		if (m_VertexBuffer.Handle) { vkDestroyBuffer(device, m_VertexBuffer.Handle, nullptr); m_VertexBuffer.Handle = VK_NULL_HANDLE; }
@@ -248,6 +319,46 @@ namespace Cubed {
 		vkCmdBindIndexBuffer(commandBuffer, m_IndexBuffer.Handle, offset, VK_INDEX_TYPE_UINT32);
 		vkCmdDrawIndexed(commandBuffer, (uint32_t)m_IndexBuffer.Size / 4, 1, 0, 0, 0);
 	}
+
+	void Renderer::RenderModels()
+	{
+		VkCommandBuffer cmd = Walnut::Application::GetActiveCommandBuffer();
+
+		vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_GraphicsPipeline);
+
+		VkDescriptorSet sets[] = { m_TexturesDescriptorSet, m_CameraDescriptorSet };
+
+		for (auto& model : m_Models)
+		{
+			for (const auto& mesh : model->GetMeshes())
+			{
+				// Bind descriptor sets once per draw
+				vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout,
+					0, 2, sets, 0, nullptr);
+
+				// Detect outline meshes by name
+				bool isOutline = (mesh.Name.find("outline") != std::string::npos);
+
+				// Fill push constants
+				m_PushConstants.Transform = model->GetTransform();
+				m_PushConstants.TextureIndex = static_cast<int>(mesh.TextureIndex);
+				m_PushConstants.IsOutline = isOutline ? 1 : 0;
+				m_PushConstants.OutlineThickness = isOutline ? 0.0f : 0.0f; // meters
+				m_PushConstants._pad = 0;
+
+				vkCmdPushConstants(cmd, m_PipelineLayout,
+					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+					0, sizeof(PushConstants), &m_PushConstants);
+
+				// Bind and draw
+				VkDeviceSize offset = 0;
+				vkCmdBindVertexBuffers(cmd, 0, 1, &mesh.VertexBuffer.Handle, &offset);
+				vkCmdBindIndexBuffer(cmd, mesh.IndexBuffer.Handle, 0, VK_INDEX_TYPE_UINT32);
+				vkCmdDrawIndexed(cmd, mesh.IndexCount, 1, 0, 0, 0);
+			}
+		}
+	}
+
 
 	void Renderer::RenderUI()
 	{
@@ -470,7 +581,7 @@ namespace Cubed {
 		// Specify rasterization state.
 		VkPipelineRasterizationStateCreateInfo raster{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-			.cullMode = VK_CULL_MODE_BACK_BIT,
+			.cullMode = VK_CULL_MODE_NONE,
 			.frontFace = VK_FRONT_FACE_CLOCKWISE,
 			.lineWidth = 1.0f };
 

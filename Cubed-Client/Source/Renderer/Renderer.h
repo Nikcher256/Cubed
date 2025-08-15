@@ -1,25 +1,14 @@
 #pragma once
 
+#include "../Assets/Model.h"
+#include "../Assets/ModelManager.h"
+
 #include "Vulkan.h"
 #include <filesystem>
 #include <glm/glm.hpp>
 
+
 namespace Cubed {
-
-	struct Buffer
-	{
-		VkBuffer Handle = nullptr;
-		VkDeviceMemory Memory = nullptr;
-		VkDeviceSize Size = 0;
-		VkBufferUsageFlagBits Usage = VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM;
-	};
-
-	struct Vertex
-	{
-		glm::vec3 Position;
-		glm::vec3 Normal;
-		glm::vec2 UV;
-	};
 
 	struct Camera
 	{
@@ -41,6 +30,8 @@ namespace Cubed {
 		void RenderUI();
 		void OnSwapchainRecreated();
 
+		void AddModel(std::shared_ptr<Cubed::Model> m) { m_Models.push_back(std::move(m)); }
+		void RenderModels();
 	private:
 		VkShaderModule loadShader(const std::filesystem::path& path);
 		void InitPipeline();
@@ -49,6 +40,9 @@ namespace Cubed {
 		void CreateFramebuffers();
 		void InitBuffers();
 		void CreateOrResizeBuffer(Buffer& buffer, uint64_t newSize);
+		void CreateTextureDescriptorSet(uint32_t maxTexId);
+		void CreateCameraDescriptorSet();
+		void LogModelInfo(const std::shared_ptr<Cubed::Model>& model);
 
 		void DestroyPipeline();
 		void DestroyFramebuffers();
@@ -68,12 +62,13 @@ namespace Cubed {
 
 		Buffer m_VertexBuffer, m_IndexBuffer, m_CameraUBO;
 
-		struct PushConstants
-		{
-			glm::mat4 Transform;
-			int TextureIndex = 0;
-			int _pad[3];
-		} m_PushConstants;
+		struct PushConstants {
+			glm::mat4 Transform;   // 64
+			int TextureIndex;          // 4
+			int IsOutline;         // 4  (0/1)
+			float OutlineThickness;// 4  (in world units)
+			int _pad;              // 4  (keep 16B alignment)
+		}m_PushConstants;
 
 		struct CameraUBO {
 			glm::mat4 ViewProjection;
@@ -90,6 +85,8 @@ namespace Cubed {
 		VkFormat     m_DepthFormat = VK_FORMAT_UNDEFINED;
 		std::vector<DepthResource> m_Depth;
 		std::vector<VkFramebuffer> m_Framebuffers;
+
+		std::vector<std::shared_ptr<Cubed::Model>> m_Models;
 
 	};
 }
