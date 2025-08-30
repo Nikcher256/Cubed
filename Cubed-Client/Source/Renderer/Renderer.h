@@ -32,6 +32,14 @@ namespace Cubed {
 
 		void AddModel(std::shared_ptr<Cubed::Model> m) { m_Models.push_back(std::move(m)); }
 		void RenderModels();
+
+		void UpdateTextures() {
+			uint32_t maxTexId = 0;
+			for (auto& m : m_Models)
+				for (auto& mesh : m->GetMeshes())
+					if (mesh.TextureIndex > maxTexId) maxTexId = mesh.TextureIndex;
+			CreateTextureDescriptorSet(maxTexId);
+		}
 	private:
 		VkShaderModule loadShader(const std::filesystem::path& path);
 		void InitPipeline();

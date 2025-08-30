@@ -54,6 +54,8 @@ namespace Cubed {
         void SetSizeMeters(float meters);
         void SetRotation(float degrees, const glm::vec3& axis);
         void SetPosition(const glm::vec3& position);
+		void SetID(uint32_t id) { m_ID = id; }
+		uint32_t GetID() const { return m_ID; }
     private:
         void LoadModel(const std::filesystem::path& path);
         void ProcessMesh(aiMesh* mesh, const aiScene* scene, const std::filesystem::path& basePath, const glm::mat4& transform);
@@ -65,6 +67,7 @@ namespace Cubed {
             const std::filesystem::path& baseDir);
 
     private:
+        uint32_t m_ID;
         std::vector<Mesh> m_Meshes;
         glm::mat4         m_Transform{ 1.0f };
     };

@@ -20,32 +20,32 @@ namespace Cubed {
 
 	void Renderer::Init()
 	{
-		// Base textures
+		//// Base textures
 		const std::filesystem::path TEXTURE_BASE_PATH = "C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Textures";
 		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "simple.png"); // id 0
-		TextureManager::LoadTexture(TEXTURE_BASE_PATH / "man.png");    // id 1
+		//TextureManager::LoadTexture(TEXTURE_BASE_PATH / "man.png");    // id 1
 
-		// Load model first (so we know max texture index)
-		auto model = Cubed::ModelManager::Load(
-			"C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/tank.glb"
-		);
-		model->SetSizeMeters(4.0f); // Set size to 1 meter
-		model->SetRotation(180.0f, glm::vec3(0, 1, 0)); // Rotate 90 degrees around Y-axis
-		model->SetPosition(glm::vec3(0, -2, 0)); // Center position
+		//// Load model first (so we know max texture index)
+		//auto model = Cubed::ModelManager::Load(
+		//	"C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/tank.glb"
+		//);
+		//model->SetSizeMeters(4.0f); // Set size to 1 meter
+		//model->SetRotation(180.0f, glm::vec3(0, 1, 0)); // Rotate 90 degrees around Y-axis
+		//model->SetPosition(glm::vec3(0, -2, 0)); // Center position
 
-		AddModel(model);
+		//AddModel(model);
 
-		auto model1 = Cubed::ModelManager::Load(
-			"C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/miyako.glb"
-		);
-		model1->SetSizeMeters(4.0f); // Set size to 1 meter
-		//model1->SetRotation(-90.0f, glm::vec3(0, 1, 0)); // Rotate 90 degrees around Y-axis
-		model1->SetPosition(glm::vec3(4, -2, 0)); // Center position
+		//auto model1 = Cubed::ModelManager::Load(
+		//	"C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/miyako.glb"
+		//);
+		//model1->SetSizeMeters(4.0f); // Set size to 1 meter
+		////model1->SetRotation(-90.0f, glm::vec3(0, 1, 0)); // Rotate 90 degrees around Y-axis
+		//model1->SetPosition(glm::vec3(4, -2, 0)); // Center position
 
-		AddModel(model1);
+		//AddModel(model1);
 
-		// Log model info
-		LogModelInfo(model);
+		//// Log model info
+		//LogModelInfo(model);
 
 		// Find max texture ID across all models
 		uint32_t maxTexId = 0;

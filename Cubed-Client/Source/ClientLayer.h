@@ -30,6 +30,7 @@ namespace Cubed {
 
 		glm::vec3 m_PlayerPosition{ 0, 0, 0};
 		glm::vec3 m_PlayerRotation{ 30.0f, 45.0f, 0 };
+		glm::mat4 m_PlayerTransform{ 1.0f };
 		glm::vec3 m_PlayerVelocity{ 0, 0, 0};
 
 		Camera m_Camera;
@@ -37,6 +38,8 @@ namespace Cubed {
 		std::string m_ServerAddress;
 
 		Walnut::Client m_Client;
+
+		std::unordered_map<uint32_t, std::shared_ptr<Cubed::Model>> m_PlayerModels;
 
 		uint32_t m_PlayerID = 0;
 

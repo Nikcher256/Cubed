@@ -12,7 +12,7 @@ namespace Cubed {
         return abs.lexically_normal();
     }
 
-    std::shared_ptr<Model> ModelManager::Load(const std::filesystem::path& path) {
+    std::shared_ptr<Model> ModelManager::Load(const std::filesystem::path& path, uint32_t id) {
         if (!std::filesystem::exists(path)) {
             throw std::runtime_error("Model file does not exist: " + path.string());
         }
@@ -25,14 +25,29 @@ namespace Cubed {
         }
 
         auto model = std::make_shared<Model>(key);
+		model->SetID(id);
         s_Cache[key] = model;
         return model;
     }
 
+    void ModelManager::RemoveModel(uint32_t id) {
+        std::lock_guard<std::mutex> lock(s_Mutex);
+        for (auto it = s_Cache.begin(); it != s_Cache.end(); ) {
+            if (auto m = it->second.lock()) {
+                if (m->GetID() == id) {
+                    it = s_Cache.erase(it);
+                    continue;
+                }
+            }
+            ++it;
+        }
+	}
+
     std::shared_ptr<Model> ModelManager::LoadInstance(const std::filesystem::path& path, const glm::mat4& transform) {
-        auto m = Load(path);
+        /*auto m = Load(path);-
         m->SetTransform(transform);
-        return m;
+        return m;*/
+        return nullptr;
     }
 
     bool ModelManager::Has(const std::filesystem::path& path) {

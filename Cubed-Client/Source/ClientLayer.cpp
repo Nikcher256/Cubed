@@ -1,12 +1,15 @@
 #include "Walnut/Input/Input.h"
 
 #include "ClientLayer.h"
+#include "Assets/ModelManager.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "Walnut/ImGui/ImGuiTheme.h"
 #include "Walnut/Serialization/BufferStream.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/euler_angles.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 #include "ServerPacket.h"
@@ -30,6 +33,16 @@ namespace Cubed {
 		m_Client.SetDataReceivedCallback([this](const Walnut::Buffer buffer) { OnDataReceived(buffer); });
 
 		m_Renderer.Init();
+		auto cube = ModelManager::Load("C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/cube.obj", m_PlayerID);
+		cube->SetSizeMeters(1.0f);
+		m_Renderer.AddModel(cube);
+		m_PlayerModels[m_PlayerID] = cube;
+		auto anime = ModelManager::Load("C:/Users/Asus/Documents/Projects/Cubed/Cubed-Client/Assets/Models/miyako.glb", m_PlayerID);
+		anime->SetSizeMeters(1.6f);
+		m_Renderer.AddModel(anime);
+		m_PlayerModels[m_PlayerID + 1] = anime;
+		m_Renderer.UpdateTextures();
+
 	}
 
 	void ClientLayer::OnDetach()
@@ -81,6 +94,9 @@ namespace Cubed {
 		}
 
 		m_PlayerRotation.y += 20.0f * ts;
+
+		m_PlayerTransform = glm::translate(glm::mat4(1.0f), m_PlayerPosition) *
+			glm::eulerAngleXYZ(glm::radians(m_PlayerRotation.x), glm::radians(m_PlayerRotation.y), glm::radians(m_PlayerRotation.z));
 
 		// --- Networking: keep protocol 2D (XZ) for now ---
 		if (m_Client.GetConnectionStatus() == Walnut::Client::ConnectionStatus::Connected)
@@ -173,13 +189,12 @@ namespace Cubed {
 	{
 		m_Renderer.BeginScene(m_Camera);
 
+		m_PlayerModels[m_PlayerID]->SetTransform(m_PlayerTransform);
 		// Example anchor cube
 		//m_Renderer.RenderCube(glm::vec3(0, 0, -5), m_PlayerRotation, 1);
 
 		// Local player: full 3D
-		//m_Renderer.RenderCube(m_PlayerPosition, m_PlayerRotation, 0);
-
-		m_Renderer.RenderModels();
+		//m_Renderer.RenderCube(m_PlayerPosition, m_PlayerRotation, 0)
 
 		// Remote players: map (x, y) -> (x, 0, z)
 		m_PlayerDataMutex.lock();
@@ -192,7 +207,7 @@ namespace Cubed {
 			glm::vec3 pos3{ data.Position.x, 0.0f, data.Position.y };
 			m_Renderer.RenderCube(pos3, m_PlayerRotation, 0);
 		}
-
+		m_Renderer.RenderModels();
 		m_Renderer.EndScene();
 	}
 
